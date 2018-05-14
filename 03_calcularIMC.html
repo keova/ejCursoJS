@@ -4,14 +4,14 @@
          P&aacute;gina con Javascript.
       </title>
       <script language="javascript">
-         <!--
+         /*
             El IMC se calcula peso (kg) / altura al cuadrado (cm)
             si IMC < 16 desnutrido
             si IMC >= 16 y < 18 delgado
             si IMC >=18 y <25 normal
             si IMC >=25 y <31 sobrepeso
             si IMC >=31 obesidad
-         //-->
+         */
          const DIR_IMAGENES = "./img/03/";
          function obtenerIMC() {
              // obtener peso y estatura
@@ -23,18 +23,12 @@
             var imagenIMC = obtenerImagenIMC(nIMC);
             var literalIMC = obtenerLiteralIMC(nIMC);
             var resultado = "El IMC es " + nIMC + " que corresponde a " + literalIMC + "<br><img src='" +
-                DIR_IMAGENES
-
-
-
-
-
-
+                DIR_IMAGENES + imagenIMC + "'>";
             document.getElementById("resultado_calculo").innerHTML = resultado;
 
          }
          function calcularIMC(peso, altura){
-            IMC = peso / (altura*altura);
+            IMC = Math.trunc(peso / ((altura/100)**2));
             return IMC;
          }
          function obtenerImagenIMC(nIMC) {
@@ -65,14 +59,14 @@
              } else {
                 literalIMC = "obesidad";
              }
-             return imagenIMC;
+             return literalIMC;
          }
       </script>
    </head>
    <body>
        <label for"peso">Peso </label><input type="number" id="peso"> kg <br>
        <label for"altura">Altura </label><input type="number" id="altura"> cm <br>
-       <button onclick="obtenerIMC">Calcula IMC</button>
+       <button onclick="obtenerIMC()">Calcula IMC</button>
        <div id="resultado_calculo"></div>
    </body>
 </html>
