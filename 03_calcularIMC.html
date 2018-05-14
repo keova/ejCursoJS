@@ -18,7 +18,7 @@
             var peso = document.getElementById("peso").value;
             var altura = document.getElementById("altura").value;
              // calcular IMC
-            var nIMC = calcularIMC(peso, altura);
+            var nIMC = calcularIMC(parseFloat(peso), parseFloat(altura));
              // informar al usuario mostrándolo con una imagen
             var imagenIMC = obtenerImagenIMC(nIMC);
             var literalIMC = obtenerLiteralIMC(nIMC);
