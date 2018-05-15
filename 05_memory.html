@@ -82,45 +82,46 @@
             var numFichaTocada = fichaTocada.id.substr(5);
             console.log("ficha tocada es " + numFichaTocada);
             // obtenemos cual es la ficha (el color oculto)
-            var colorOculto = eval("COLOR" + repartoFichas[numFichaTocada]);
-            // mostramos el color oculto
-            fichaTocada.bgcolor = colorOculto;
-            // ver el estado de juego 
-            if (estado == PRIMER_CLICK) {
-                ficha1 = numFichaTocada;
-                // cambiamos al siguiente estado
-                estado = SEGUNDO_CLICK;
-            } else if (estado == SEGUNDO_CLICK) {
-                ficha2 = numFichaTocada;
-                if (repartoFichas[ficha1] == repartoFichas[ficha2]) {
-                    // aumentamos el número de aciertos
-                    numAciertos++;
-                    if (numAciertos == totalParejas) {
-                        alert("fin de juego");
-                    // fin del juego
+            var colorOculto = eval("COLOR" + repartoFichas[numFichaTocada-1]);
+            // comprobamos que no es una ficha vuelta (de las parejas correctas)
+            if (fichaTocada.style.backgroundColor == COLOR_REVES) {
+                // mostramos el color oculto
+                fichaTocada.style.backgroundColor = colorOculto;
+                // ver el estado de juego 
+                if (estado == PRIMER_CLICK) {
+                    ficha1 = numFichaTocada;
+                    // cambiamos al siguiente estado
+                    estado = SEGUNDO_CLICK;
+                } else if (estado == SEGUNDO_CLICK) {
+                    ficha2 = numFichaTocada;
+                    // comparamos si son las misma ficha
+                    if (repartoFichas[ficha1-1] == repartoFichas[ficha2-1]) {
+                        // aumentamos el número de aciertos
+                        numAciertos++;
+                        if (numAciertos == totalParejas) {
+                            alert("fin de juego");
+                        // fin del juego
+                        }
                     } else {
-                        alert("acierto");
+                    // No ha acertado, esperamos un pequeños tiempo y damos la vuelta a las fichas
+                        window.setTimeout("voltearFichas(ficha1, ficha2)", 1000);
                     }
-                } else {
-                // No ha acertado, esperamos un pequeños tiempo y damos la vuelta a las fichas
-                    esperar(2);
-                    document.getElementById("ficha" + ficha1).bgcolor = COLOR_REVES;
-                    document.getElementById("ficha" + ficha2).bgcolor = COLOR_REVES;
+                    // cambiamos al siguiente estado
+                    estado = PRIMER_CLICK;
                 }
-                // cambiamos al siguiente estado
-                estado = PRIMER_CLICK;
             }
         }
-        function esperar(nsegundos) {
-            objetivo = (new Date()).getTime() + 1000 * Math.abs(nsegundos);
-            while ( (new Date()).getTime() < objetivo );
+
+        function voltearFichas(ficha1, ficha2) {
+            document.getElementById("ficha" + ficha1).style.backgroundColor = COLOR_REVES;
+            document.getElementById("ficha" + ficha2).style.backgroundColor = COLOR_REVES;
         }
 
         function generarListaNumeros(longitud) {
             var listaNumeros = new Array();
             for (i = 1; i <= (longitud/2); i++) {
-                listaNumeros[i] = i;
-                listaNumeros[(longitud/2)+i] = i;
+                listaNumeros[i-1] = i;
+                listaNumeros[(longitud/2)+i-1] = i;
             }
             return listaNumeros;
         }
@@ -153,7 +154,7 @@
             for (var fil = 0; fil < numFil; fil++) {
                 tablero += "<tr>";
                 for (var col = 0; col < numCol; col++) {
-                    tablero += "<td width='70' height='70' bgcolor='" + COLOR_REVES + "' id='ficha" + numFicha + "'></td>";
+                    tablero += "<td width='70' height='70' style='background-color: " + COLOR_REVES + ";' id='ficha" + numFicha + "'></td>";
                     numFicha++;
                 }
                 tablero += "</tr>";
