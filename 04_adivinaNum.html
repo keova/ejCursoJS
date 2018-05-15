@@ -11,8 +11,9 @@
 
        var numSecreto;
 
-       function generarNumAleatorio(numMax) {
-           var numero = Math.ceil(Math.random()*numMax);
+       function generarNumAleatorio(lim_inferior, lim_superior) {
+           // suponemos que los limites que llegan son num enteros y el superior es 
+           var numero = Math.ceil((Math.random()*(lim_superior - lim_inferior+1) + lim_inferior)); // confirmar si se necesita un +1 o un -1
            console.log("El número aleatorio es " + numero);
            return numero;
        }
@@ -31,7 +32,7 @@
             var vidas = obtenerVidas(nivel);
             console.log("vidas " + vidas);
             // Obtenemos un número aleatorio entre 1 y el número tope de rango en función del nivel de juego
-            numSecreto = generarNumAleatorio(numMax);
+            numSecreto = generarNumAleatorio(0, numMax);
             // Intentos del usuario de adivinar el número secreto
             do {
                 intentos++;

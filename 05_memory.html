@@ -1,0 +1,175 @@
+<html>
+   <head>
+      <title>
+         Memory
+      </title>
+      <script language="javascript">
+        // constantes de los niveles de juego
+        NIVEL_FACIL = 1;
+        NIVEL_MEDIO = 2;
+        NIVEL_DIFICIL = 3;
+        // constantes de los colores usar para las casillas
+        COLOR_REVES = "black";
+        COLOR1 = "red";
+        COLOR2 = "green";
+        COLOR3 = "blue";
+        COLOR4 = "pink";
+        COLOR5 = "orange";
+        COLOR6 = "yellow";
+        COLOR7 = "grey";
+        COLOR8 = "brown";
+        // ESTADOS DE JUEGO
+        PRIMER_CLICK = 1;
+        SEGUNDO_CLICK = 2;
+        EN_ESPERA = 0;
+
+        // VARIABLES GLOBALES DEL JUEGO
+        var estado;
+        var numAciertos;
+        var ficha1;
+        var ficha2;
+        var repartoFichas;
+        var totalParejas;
+    
+
+        function jugar(nivel) {
+            // variables
+            var datosNivel;
+            var numCol;
+            var numFil;
+            var tablero;
+            // INICIALIZAMOS EL JUEGO
+            estado = PRIMER_CLICK;
+            numAciertos = 0;
+            // obtenemos los parametros del nivel
+            datosNivel = obtenerDatosNivel(nivel);
+            numCol = datosNivel["numCol"];
+            numFil = datosNivel["numFil"];
+            totalParejas = numCol * numFil / 2;
+            // Obtenemos el tablero en función de los parametros definidos para el nivel de juego seleccionado
+            tablero = generarTablero(numCol,numFil);
+            // mostramos el tablero en pantalla
+            document.getElementById("tablero").innerHTML = tablero;
+            // Ponemos los listener 
+            incluirEventosJuego();
+            // Vamos a "repartir" las fichas del memory en el tablero
+            repartoFichas = repartirFichasEnTablero(numCol*numFil);
+
+
+        }
+
+        function repartirFichasEnTablero(longitud) {
+            var ordenRepartoFichas;
+
+            ordenRepartoFichas = generarListaNumeros(longitud);
+            ordenRepartoFichas = desordenar(ordenRepartoFichas);
+
+            return ordenRepartoFichas;
+        }
+
+        function incluirEventosJuego() {
+            var lista_td = document.getElementById("tablero").querySelectorAll("td");
+            for (var i = 0; i < lista_td.length; i++) {
+                lista_td[i].addEventListener('click', descubrirFicha);
+            }
+        }
+
+        function descubrirFicha(evento) {
+            //target, es el elemento tocado
+            //currentTarget, es el elemento contenedor
+            var fichaTocada = evento.target;
+            // obtener número de ficha pulsada
+            var numFichaTocada = fichaTocada.id.substr(5);
+            console.log("ficha tocada es " + numFichaTocada);
+            // obtenemos cual es la ficha (el color oculto)
+            var colorOculto = eval("COLOR" + repartoFichas[numFichaTocada]);
+            // mostramos el color oculto
+            fichaTocada.bgcolor = colorOculto;
+            // ver el estado de juego 
+            if (estado == PRIMER_CLICK) {
+                ficha1 = numFichaTocada;
+                // cambiamos al siguiente estado
+                estado = SEGUNDO_CLICK;
+            } else if (estado == SEGUNDO_CLICK) {
+                ficha2 = numFichaTocada;
+                if (repartoFichas[ficha1] == repartoFichas[ficha2]) {
+                    // aumentamos el número de aciertos
+                    numAciertos++;
+                    if (numAciertos == totalParejas) {
+                        alert("fin de juego");
+                    // fin del juego
+                    } else {
+                        alert("acierto");
+                    }
+                } else {
+                // No ha acertado, esperamos un pequeños tiempo y damos la vuelta a las fichas
+                    esperar(2);
+                    document.getElementById("ficha" + ficha1).bgcolor = COLOR_REVES;
+                    document.getElementById("ficha" + ficha2).bgcolor = COLOR_REVES;
+                }
+                // cambiamos al siguiente estado
+                estado = PRIMER_CLICK;
+            }
+        }
+        function esperar(nsegundos) {
+            objetivo = (new Date()).getTime() + 1000 * Math.abs(nsegundos);
+            while ( (new Date()).getTime() < objetivo );
+        }
+
+        function generarListaNumeros(longitud) {
+            var listaNumeros = new Array();
+            for (i = 1; i <= (longitud/2); i++) {
+                listaNumeros[i] = i;
+                listaNumeros[(longitud/2)+i] = i;
+            }
+            return listaNumeros;
+        }
+        function obtenerDatosNivel(nivel) {
+            var datosNivel = new Object();
+            if (nivel == NIVEL_FACIL) {
+                datosNivel.numCol = 2;
+                datosNivel.numFil = 3;
+            } else if (nivel == NIVEL_MEDIO) {
+                datosNivel.numCol = 3;
+                datosNivel.numFil = 4;
+            } else {
+                datosNivel.numCol = 4;
+                datosNivel.numFil = 4;
+            }
+
+            return datosNivel;
+        }
+
+        function desordenar(lista){
+            var listaDesordenada;
+            listaDesordenada = lista.sort(function() {return Math.random() - 0.5});
+            return listaDesordenada;
+        }
+
+        function generarTablero(numCol, numFil) {
+            var tablero;
+            var numFicha = 1;
+            tablero ="<table border='2'>";
+            for (var fil = 0; fil < numFil; fil++) {
+                tablero += "<tr>";
+                for (var col = 0; col < numCol; col++) {
+                    tablero += "<td width='70' height='70' bgcolor='" + COLOR_REVES + "' id='ficha" + numFicha + "'></td>";
+                    numFicha++;
+                }
+                tablero += "</tr>";
+            }
+            tablero += "</table>"
+            return tablero;
+        }
+
+
+      </script>
+
+   </head>
+   <body>
+       <button onclick="jugar(NIVEL_FACIL);">Fácil</button>
+       <button onclick="jugar(NIVEL_MEDIO);">Medio</button>
+       <button onclick="jugar(NIVEL_DIFICIL);">Difícil</button>
+       <div id="tablero"></div>
+   </body>
+</html>
