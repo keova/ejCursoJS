@@ -1,4 +1,4 @@
-<!--
+<!-- 
     En una tabla ir introduciendo las palabras introducidas en un campo de tipo input.
     Las palabras se insertaran tambien en un array para posteriores usos.
     1. Detecto evento click (para insertar)
@@ -7,12 +7,17 @@
     Segunda parte
     que al pulsar sobre una palabra esta se elimine tanto de la tabla como del array
     
--->
+ -->
 <html>
    <head>
       <title>
          Crea Tabla Array
       </title>
+      <style>
+        tr {
+            cursor: pointer;
+        }
+      </style>
       <script language="javascript">
           // VARIABLES GLOBALES
           // Array donde guardaremos las palabras
@@ -21,12 +26,15 @@
             var palabra;
             // recuperamos la palabra a guardar
             palabra = document.getElementById("palabra").value;
-            // guardamos la palabra en el array
-            arrayPalabras.push(palabra);
-            // guardamos la palabra en la tabla
-            incluirPalabraEnTabla(palabra);
-            // inicializamos la caja de texto de introducir palabras
-            document.getElementById("palabra").value = "";
+            // comprobamos que no devuelva vacio
+            if (palabra != "") {
+                // guardamos la palabra en el array
+                arrayPalabras.push(palabra);
+                // guardamos la palabra en la tabla
+                incluirPalabraEnTabla(palabra);
+                // inicializamos la caja de texto de introducir palabras
+                document.getElementById("palabra").value = "";
+            }
         }
         // FUNCION que guarda la palabra en la tabla
         function incluirPalabraEnTabla(palabra) {
@@ -37,6 +45,8 @@
             hookTabla = document.getElementById("tablaPalabras");
             // creamos un elemento de tipo tr
             eleTR = document.createElement("TR");
+            // le añadimos el evento para detectar cuando pulsa sobre el
+            eleTR.addEventListener('click', borrarPalabra);
             // lo añadimos a la tabla
             hookTabla.appendChild(eleTR);
             // creamos un elemento de tipo TD
@@ -45,6 +55,28 @@
             eleTD.innerHTML = palabra;
             // añadimos el elemento TD al TR
             eleTR.appendChild(eleTD);
+        }
+
+        function borrarPalabra(evento) {
+            var trTocada = evento.currentTarget;
+            var posTocada;
+            // Localizamos el índice del tr dentro de la tabla
+            posTocada = localizarPosicionABorrar(trTocada);
+            // Borramos el tr de la tabla
+            trTocada.remove();
+            // Eliminamos del array usando el índice del tr
+            arrayPalabras.splice(posTocada, 1);
+        }
+
+        function localizarPosicionABorrar(elemento) {
+            var posTocada;
+            var tabla;
+            var arrayTR;
+            // Localizamos el índice del tr dentro de la tabla
+            tabla = elemento.parentNode;
+            arrayTR = Array.from(tabla.childNodes);
+            posTocada = arrayTR.indexOf(elemento);
+            return posTocada;
         }
       </script>
    </head>
