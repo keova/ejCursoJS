@@ -3,6 +3,8 @@
     <title>
         Memory
     </title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://albert-gonzalez.github.io/easytimer.js/dist/easytimer.min.js"></script>
     <script language="javascript">
         // constantes de los niveles de juego
         const NIVEL_FACIL = 1;
@@ -29,7 +31,7 @@
         var ficha2;
         var repartoFichas;
         var totalParejas;
-
+        var timer;
 
         function jugar(nivel) {
             // variables
@@ -55,7 +57,14 @@
             incluirEventosJuego();
             // Vamos a "repartir" las fichas del memory en el tablero
             repartoFichas = repartirFichasEnTablero(numCol * numFil);
-
+            // inicializamos el timer
+            document.getElementById("basicUsage").innerHTML = "00:00:00";
+            timer = new Timer();
+            timer.start();
+            timer.addEventListener('secondsUpdated', function (e) {
+                document.getElementById("basicUsage").innerHTML = timer.getTimeValues().toString();
+                //$('#basicUsage').html(timer.getTimeValues().toString()); // los mismo que antes usando jQuery
+            });
         }
 
         function repartirFichasEnTablero(longitud) {
@@ -100,6 +109,9 @@
                         // aumentamos el número de aciertos
                         numAciertos++;
                         if (numAciertos == totalParejas) {
+                            // paramos el timer
+                            timer.pause();
+                            // mostramos el mensaje de final de juego
                             document.getElementById("mensajeFinal").innerHTML = "<strong>Lo has conseguido!!!</strong>";
                         }
                     } else {
@@ -178,6 +190,7 @@
     <button onclick="jugar(NIVEL_DIFICIL);">Difícil</button>
     <div id="tablero"></div>
     <div id="mensajeFinal"></div>
-</body>
+    <div id="basicUsage"></div>
 
+</body>
 </html>
