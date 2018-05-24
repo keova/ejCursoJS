@@ -85,6 +85,7 @@
 
             function mostrarSiguienteImagen() {
                 // Calculamos la foto siguiente a mostrar en función de la actual
+                // otra opción es usando (cont MOD array.length) y teniendo en cuenta desde donde se empiez
                 if (posFotoActual < listaFotos.length - 1) {
                     posFotoActual++
                 } else {
