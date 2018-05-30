@@ -1,11 +1,11 @@
-<!-- descripción 
+<!-- 
 Ejemplo para consumir datos del API de iTunes
 Vamos a usar un servicio para buscar música. 
 Le enviamos lo que queremos buscar y nos devuelve una
 lista de canciones que habra que mostrar en la pantalla.
 De cada canción mostraremos los siguientes datos:
 - trackid (oculto)
-- titulo
+- trackName
 - artistName
 - artworkUrl100
 - trackPrice
@@ -21,6 +21,7 @@ De cada canción mostraremos los siguientes datos:
         <script src="15_cancion_iTunes.js"></script>
         <script language="javascript">
             const URL_SERVICIO = "https://itunes.apple.com/search?media=music&limit=20&term=";
+            const URL_COMPRA = "http://10.1.2.10:8080/appwebprofe/Comprar";
             var xmlHTTP = new XMLHttpRequest();
 
             function buscar() {
@@ -68,27 +69,38 @@ De cada canción mostraremos los siguientes datos:
             }
 
             function prepararHtmlCancion(cancion) {
+                // creamos los elementos HTML para mostrar la canción y sus datos
+                // HTML del contenedor, donde estarán todos los datos
                 var htmlCancion = document.createElement("DIV");
                 htmlCancion.id = cancion.id;
                 htmlCancion.className = "cancion";
+                // Imagen
                 var htmlImgCancion = document.createElement("IMG");
                 htmlImgCancion.src = cancion.imagen;
-                htmlImgCancion.addEventListener('mouseover', mostrarPlay);
+                //htmlImgCancion.addEventListener('mouseover', mostrarPlay);
+                // campo check con el ID para las compras
                 var htmlIdCancion = document.createElement("INPUT");
                 htmlIdCancion.value = cancion.id;
-                htmlIdCancion.type = "hidden";
+                htmlIdCancion.type = "checkbox";
+                htmlIdCancion.name = "id_cancion";
+                // Título 
                 var htmlTitulo = document.createElement("SPAN");
                 htmlTitulo.className = "tituloCancion";
                 htmlTitulo.innerHTML = cancion.titulo;
+                // Artista
                 var htmlArtista = document.createElement("SPAN");
                 htmlArtista.className = "artistaCancion";
                 htmlArtista.innerHTML = cancion.artista;
+                // Precio
                 var htmlPrecio = document.createElement("SPAN");
                 htmlPrecio.className = "precioCancion";
+                htmlPrecio.name = "precioCancion";
                 htmlPrecio.innerHTML = cancion.precio;
+                // Moneda
                 var htmlMoneda = document.createElement("SPAN");
                 htmlMoneda.className = "monedaCancion";
                 htmlMoneda.innerHTML = cancion.moneda;
+                // Muestra
                 var htmlMuestra = document.createElement("AUDIO");
                 htmlMuestra.className = "muestraCancion";
                 htmlMuestra.src = cancion.muestra;
@@ -120,6 +132,8 @@ De cada canción mostraremos los siguientes datos:
                 var precio;
                 var moneda;
                 var muestra;
+                // Recorremos el JSON de respuesta, extrayendo las canciones y sus datos
+                // y guardandolas en un array
                 if (respuesta != null) {
                     var JSONCanciones = JSON.parse(respuesta);
                     var totalCanciones = JSONCanciones.resultCount;
@@ -146,15 +160,43 @@ De cada canción mostraremos los siguientes datos:
             function ocultarEnEspera() {
                 document.getElementById("esperando").hidden = true;
             }
-            function mostrarPlay(evento) {
-                console.log("dentro de mostrarPlay");
-                var imgOver = evento.target;
-                var idPlay = document.getElementById("play");
-                //idPlay.height = imgOver.height;
-                //idPlay.width = imgOver.width;
-                idPlay.style.pixelTop = "150px"; //imgOver.x;
-                idPlay.style.pixelLeft = "300px"; //imgOver.y;
-                idPlay.hidden = false;
+
+            function comprar() {
+                // obtenemos las canciones a comprar (los id de las canciones)
+                var idCanciones = document.getElementsByName("id_cancion");
+                //var precioCanciones = document.getElementsByName("precioCancion");
+                var precioCanciones = document.getElementsByClassName("precioCancion");
+                var precioPedido = 0;
+                var idCancionesSeleccionadas = new Array();
+                var pedido;
+                for (i = 0; i < idCanciones.length; i++) {
+                    if (idCanciones[i].checked) {
+                        precioPedido = precioPedido + parseFloat(precioCanciones[i].innerHTML);
+                        idCancionesSeleccionadas.push(idCanciones[i].value);
+                    }
+                }
+                var pedido = {
+                    precio_pedido: precioPedido,
+                    lista_ids: idCancionesSeleccionadas
+                };
+                var pedidoJSON = JSON.stringify(pedido);
+                console.log("pedidoJSON = " + pedidoJSON);
+                // Preparo la llamada
+                xmlHTTP.onreadystatechange = resultadoCompra;
+                // paramentros de open (metodo a usar, servicio que se llama, esAsincrono)
+                xmlHTTP.open('POST', URL_COMPRA, true);
+                xmlHTTP.setRequestHeader('Content-Type', 'application/json');
+                xmlHTTP.send(pedidoJSON); // el cuerpo del mensaje
+            }
+
+            function resultadoCompra() {
+                var estado = xmlHTTP.readyState;
+                console.log("procesar evento invocado " + estado);
+                // cuando estado = 4 procesamos el mensaje HTTP de respuesta
+                if (estado == 4) {
+                    var respuesta = xmlHTTP.responseText;
+                    console.log(respuesta);
+                }
             }
         </script>
     </head>
@@ -162,10 +204,10 @@ De cada canción mostraremos los siguientes datos:
         <label for="txt_busqueda">Buscar canci&oacute;n: </label>
         <input type="text" id="txt_busqueda">
         <button onclick="buscar()">Buscar</button>
+        <button onclick="comprar()">Comprar</button>
         <br>
         <br>
         <div id="resultados"></div>
         <div id="esperando" class="centrar" hidden><img src="img/15/cargando-gif-animado-12.gif"></div>
-        <div id="play" >PLAY</div>
     </body>
 </html>
