@@ -1,0 +1,50 @@
+<!-- descripción 
+-->
+<html>
+    <head>
+        <title>
+            Prueba primeraAPI
+        </title>
+        <script language="javascript">
+            const DIR_SERV_ENVIO = "http://localhost:8090/frase";
+            var xmlHTTP = new XMLHttpRequest();
+
+            function obtenerFrase() {
+                // mandamos petición a la API
+                // Preparo la llamada
+                xmlHTTP.onreadystatechange = mostrarFrase;
+                // paramentros de open (metodo a usar, servicio que se llama, esAsincrono)
+                xmlHTTP.open('GET', DIR_SERV_ENVIO, true);
+                //xmlHTTP.setRequestHeader('Content-Type', 'application/json');
+                xmlHTTP.send(null);
+            }
+
+            function obtenerFrase1() {
+                var frases = new Array();
+                frases.push("Tu puedes!");
+                frases.push("Eres la mejor!");
+                frases.push("Seguro que lo logras!");
+                frases.push("Vas a conseguirlo!");
+                frases.push("Cada día mejor");
+                var numAleatorio = Math.ceil((Math.random()*(5)));
+                console.log(frases.length);
+                console.log("frase " + frases[numAleatorio]);
+            }
+
+
+            function mostrarFrase() {
+                var estado = xmlHTTP.readyState;
+                console.log("procesar evento invocado " + estado);
+                // cuando estado = 4 procesamos el mensaje HTTP de respuesta
+                if (estado == 4) {
+                    frase = xmlHTTP.responseText;
+                    console.log(frase);
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <button onclick="obtenerFrase()">Quiero una frase</button>
+        <div id="frases"></div>
+    </body>
+</html>
